@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShareBite — Leftover Food for Urban Areas</title>
+  <meta name="description" content="ShareBite connects surplus food from donors to NGOs and people in need across urban areas." />
+  <style>
+    :root{
+      --bg:#0f172a;          /* slate-900 */
+      --card:#0b1327;        /* custom dark */
+      --muted:#9ca3af;       /* gray-400 */
+      --text:#e5e7eb;        /* gray-200 */
+      --brand:#22c55e;       /* green-500 */
+      --brand-2:#14b8a6;     /* teal-500 */
+      --accent:#f59e0b;      /* amber-500 */
+      --danger:#ef4444;      /* red-500 */
+      --shadow:0 10px 25px rgba(0,0,0,.35);
+      --radius:18px;
+      --pad: clamp(16px, 2vw, 24px);
+      --content: min(1200px, 92vw);
+      --focus: 0 0 0 3px rgba(34,197,94,.45);
+      --ring: rgba(255,255,255,.12);
+    }
+    [data-theme="light"]{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --muted:#4b5563;
+      --text:#0b1320;
+      --ring: rgba(0,0,0,.08);
+      --shadow: 0 12px 30px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(20,184,166,.12), transparent 60%),
+        radial-gradient(1000px 600px at 110% 10%, rgba(34,197,94,.10), transparent 60%),
+        linear-gradient(180deg, #0b1022 0%, var(--bg) 60%);
+      color:var(--text);
+      line-height:1.6;
+      scroll-behavior:smooth;
+    }
+    [data-theme="light"] body{ background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 50%); }
+
+    /* Skip link */
+    .skip{position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden}
+    .skip:focus{left:12px; top:12px; width:auto; height:auto; background:#000; color:#fff; padding:.5rem .75rem; border-radius:10px; z-index:1000}
+
+    /* Header / Nav */
+    header{
+      position:sticky; top:0; z-index:50;
+      background:rgba(15,23,42,.7);
+      backdrop-filter: blur(8px);
+      border-bottom:1px solid var(--ring);
+    }
+    [data-theme="light"] header{background: rgba(255,255,255,.7)}
+    .nav{
+      max-width:var(--content); margin:auto; display:flex; align-items:center; justify-content:space-between;
+      padding:.8rem var(--pad);
+    }
+    .brand{display:flex; align-items:center; gap:.6rem; font-weight:800; letter-spacing:.4px}
+    .brand .logo{
+      width:34px;height:34px; display:grid; place-items:center; border-radius:10px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      box-shadow: var(--shadow);
+    }
+    .nav a{ color:var(--text); text-decoration:none; opacity:.9}
+    .nav-links{display:flex; gap:1rem; align-items:center}
+    .nav-links a{padding:.5rem .7rem; border-radius:10px}
+    .nav-links a:focus{outline:none; box-shadow:var(--focus)}
+    .nav-links a:hover{background:rgba(255,255,255,.06)}
+    .btn{
+      display:inline-grid; place-items:center; gap:.5rem;
+      background:linear-gradient(135deg, var(--brand), var(--brand-2));
+      color:#08131a; font-weight:800; padding:.7rem 1rem; border-radius:12px; border:none; cursor:pointer;
+      box-shadow: var(--shadow);
+    }
+    .btn:focus{outline:none; box-shadow:var(--focus)}
+    .btn[aria-busy="true"]{opacity:.7; pointer-events:none}
+    .btn.secondary{
+      background:transparent; color:var(--text); border:1px solid var(--ring)
+    }
+    .icon-btn{background:transparent; border:1px solid var(--ring); color:var(--text); border-radius:12px; padding:.55rem .7rem; display:inline-flex; align-items:center; gap:.5rem}
+
+    .toolbar{display:flex; gap:.5rem; align-items:center}
+
+    /* Hero */
+    .hero{
+      max-width:var(--content); margin:auto; padding: 3.5rem var(--pad) 2rem;
+      display:grid; grid-template-columns: 1.08fr .92fr; gap:2rem; align-items:center;
+    }
+    .hero h1{
+      font-size: clamp(28px, 5vw, 52px);
+      line-height:1.15; margin:0 0 .6rem 0;
+      letter-spacing:.2px;
+    }
+    .hero p{color:var(--muted); font-size: clamp(14px, 2.2vw, 18px)}
+    .hero .cta{display:flex; gap:.7rem; flex-wrap:wrap; margin-top:1rem}
+    .glass{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--ring);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .stat{ display:grid; gap:.2rem; text-align:center; padding:.9rem 1.2rem; min-width:120px }
+    .stat .big{font-weight:900; font-size: clamp(22px, 4.2vw, 34px)}
+    .stat .small{color:var(--muted); font-size:13px}
+
+    .hero-visual{
+      aspect-ratio: 1/1; border-radius:var(--radius); padding:18px; position:relative;
+      background:
+        radial-gradient(600px 300px at 80% -20%, rgba(245,158,11,.18), transparent 50%),
+        radial-gradient(600px 400px at -10% 110%, rgba(20,184,166,.2), transparent 60%),
+        #0a1226;
+      border:1px solid var(--ring);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .grid-balls{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(6,1fr); gap:10px; padding:18px }
+    .ball{ border-radius:12px; background:linear-gradient(135deg, rgba(34,197,94,.18), rgba(20,184,166,.18)); border:1px solid var(--ring); animation: float 6s ease-in-out infinite }
+    .ball:nth-child(odd){animation-duration:7.5s}
+    .reduce-motion .ball{animation: none}
+    @keyframes float{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+    /* Sections */
+    section{max-width:var(--content); margin:0 auto; padding: 2.2rem var(--pad)}
+    h2{font-size: clamp(22px, 3vw, 34px); margin:0 0 .6rem}
+    .muted{color:var(--muted)}
+    .cards{display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem}
+    .card{padding:1.2rem; border-radius:var(--radius); border:1px solid var(--ring); background:var(--card)}
+    .card h3{margin:.2rem 0 .5rem}
+    .chip{display:inline-block; padding:.25rem .6rem; font-size:12px; border-radius:999px; border:1px solid var(--ring); color:var(--muted)}
+    .list{display:grid; gap:.4rem; margin:0; padding-left:1.1rem}
+    .list li{margin:.1rem 0}
+    .pill{ display:inline-flex; gap:.5rem; align-items:center; padding:.45rem .7rem; border-radius:999px; background:rgba(34,197,94,.12); color:#b6f3c7; border:1px solid rgba(34,197,94,.25); font-size:13px }
+
+    /* Tabs / Dashboard */
+    .tabs{display:flex; gap:.4rem; border-bottom:1px solid var(--ring); margin-bottom:1rem}
+    .tab{padding:.6rem .9rem; border-radius:10px 10px 0 0; border:1px solid var(--ring); border-bottom:none; background:var(--card); cursor:pointer}
+    .tab[aria-selected="true"]{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02))}
+    .panel{display:none}
+    .panel.active{display:block}
+
+    /* Table */
+    table{width:100%; border-collapse:separate; border-spacing:0; border:1px solid var(--ring); border-radius:14px; overflow:hidden}
+    thead th{background:rgba(255,255,255,.04); text-align:left; padding:.7rem}
+    tbody td{padding:.6rem .7rem; border-top:1px solid var(--ring); vertical-align:top}
+    tr:hover td{background:rgba(255,255,255,.03)}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+
+    /* Forms */
+    .form{ display:grid; gap:.8rem; padding:1rem; border-radius:var(--radius); border:1px solid var(--ring); background:var(--card) }
+    .row{ display:grid; grid-template-columns: repeat(2, 1fr); gap:.8rem }
+    label{font-size:13px; color:var(--muted)}
+    input, select, textarea{
+      width:100%; border:1px solid var(--ring); background:#0a1022; color:var(--text);
+      border-radius:12px; padding:.75rem .8rem; outline:none;
+    }
+    [data-theme="light"] input,[data-theme="light"] select,[data-theme="light"] textarea{ background:#f9fbff }
+    textarea{min-height:110px; resize:vertical}
+    .hint{font-size:12px; color:var(--muted)}
+    .inline{display:flex; gap:.5rem; align-items:center; flex-wrap:wrap}
+    .preview{display:flex; gap:.6rem; align-items:center}
+    .preview img{max-height:60px; border-radius:10px; border:1px solid var(--ring)}
+
+    /* Impact bar */
+    .impact{ display:grid; grid-template-columns: repeat(4, 1fr); gap:1rem }
+    .impact .meter{ padding: 1rem; border:1px solid var(--ring); border-radius:var(--radius); background:var(--card) }
+    progress{ width:100%; height:12px; -webkit-appearance:none; appearance:none; border:none; background:rgba(255,255,255,.08); border-radius:999px; overflow:hidden }
+    progress::-webkit-progress-bar{background:rgba(255,255,255,.08)}
+    progress::-webkit-progress-value{background: linear-gradient(90deg, var(--brand), var(--accent))}
+    progress::-moz-progress-bar{background: linear-gradient(90deg, var(--brand), var(--accent))}
+
+    /* FAQ */
+    details{ border:1px solid var(--ring); background:var(--card); border-radius:14px; padding: .9rem 1rem }
+    details + details{margin-top:.6rem}
+    summary{cursor:pointer; font-weight:700}
+    summary::-webkit-details-marker{display:none}
+    .kpis{display:grid; grid-template-columns: repeat(2, 1fr); gap:1rem}
+
+    /* Footer */
+    footer{ margin-top:2rem; padding: 2rem var(--pad); background: #0a1226; border-top:1px solid var(--ring) }
+    [data-theme="light"] footer{ background:#eef4ff }
+    .foot{max-width:var(--content); margin:auto; display:grid; grid-template-columns: 1.2fr .8fr; gap:1rem}
+    .tiny{font-size:12px; color:var(--muted)}
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .hero{grid-template-columns:1fr; padding-top:2.2rem}
+      .hero-visual{order:-1}
+      .cards{grid-template-columns:1fr 1fr}
+      .impact{grid-template-columns:1fr 1fr}
+      .row{grid-template-columns:1fr}
+      .foot{grid-template-columns:1fr}
+    }
+    @media (max-width: 560px){
+      .cards{grid-template-columns:1fr}
+      .impact{grid-template-columns:1fr}
+      .nav-links{display:none}
+      .menu-btn{display:inline-grid}
+    }
+
+    /* Mobile menu */
+    .menu-btn{display:none}
+    .mobile-menu{ display:none; border-top:1px solid var(--ring); padding: .5rem var(--pad) }
+    .mobile-menu a{display:block; padding:.6rem 0; color:var(--text); text-decoration:none; opacity:.9}
+    .show{display:block}
+
+    /* Toast */
+    .toast{ position: fixed; right:16px; bottom:16px; background:#071021; color:var(--text); padding:.8rem 1rem; border-radius:12px; border:1px solid var(--ring); box-shadow:var(--shadow); z-index:60; display:none }
+    .toast.show{display:block; animation:fade 3.2s ease forwards}
+    @keyframes fade{ 0%{opacity:0; transform:translateY(8px)} 10%{opacity:1; transform:translateY(0)} 80%{opacity:1} 100%{opacity:0} }
+
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip">Skip to content</a>
+
+  <!-- Header -->
+  <header>
+    <nav class="nav" aria-label="Primary">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <!-- seed icon -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#052016" aria-hidden="true"><path d="M12 2c5.523 0 10 4.477 10 10 0 2.83-1.178 5.392-3.074 7.226-1.019-3.91-4.186-7.077-8.096-8.096C8.392 10.178 5.83 9 3 9 3 4.477 7.477 2 12 2Z"/><path d="M3 11c6.627 0 12 5.373 12 12-6.627 0-12-5.373-12-12Z" fill="#0cf29a"/></svg>
+        </div>
+        <span id="i_brand">ShareBite</span>
+      </div>
+      <div class="toolbar">
+        <div class="nav-links" id="navLinks">
+          <a href="#how" id="i_nav_how">How it works</a>
+          <a href="#donate" id="i_nav_donate">Donate Food</a>
+          <a href="#ngo" id="i_nav_ngo">NGOs</a>
+          <a href="#impact" id="i_nav_impact">Impact</a>
+          <a href="#dashboard" id="i_nav_dash">Dashboard</a>
+          <a href="#faq" id="i_nav_faq">FAQ</a>
+        </div>
+        <button class="icon-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle light/dark">
+          <span>🌓</span><span id="i_theme">Theme</span>
+        </button>
+        <button class="icon-btn" id="motionToggle" title="Reduce motion" aria-pressed="false"><span>🧘</span><span id="i_motion">Motion</span></button>
+        <select id="lang" class="icon-btn" title="Language">
+          <option value="en">EN</option>
+          <option value="hi">हिं</option>
+        </select>
+        <button class="btn menu-btn" id="menuToggle" aria-expanded="false" aria-controls="mobileMenu">Menu</button>
+        <a class="btn" href="#donate" id="i_cta_start">Start Donating</a>
+      </div>
+    </nav>
+    <div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Mobile Menu">
+      <a href="#how" onclick="closeMenu()">How it works</a>
+      <a href="#donate" onclick="closeMenu()">Donate Food</a>
+      <a href="#ngo" onclick="closeMenu()">NGOs</a>
+      <a href="#impact" onclick="closeMenu()">Impact</a>
+      <a href="#dashboard" onclick="closeMenu()">Dashboard</a>
+      <a href="#faq" onclick="closeMenu()">FAQ</a>
+    </div>
+  </header>
+
+  <main id="main">
+  <!-- Hero -->
+  <section class="hero">
+    <div>
+      <span class="pill" aria-label="mission"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm1 14h-2v-2h2v2Zm0-4h-2V6h2v6Z"/></svg> <span id="i_tag">Zero Food Waste • Zero Hunger</span></span>
+      <h1 id="i_h1">Turn <em>surplus</em> meals into smiles—instantly.</h1>
+      <p id="i_sub">ShareBite connects restaurants, caterers, events, and households with NGOs and shelters nearby. Post leftovers, get a pickup, track impact.</p>
+      <div class="cta">
+        <a class="btn" href="#donate" id="i_cta_donate">Donate Food Now</a>
+        <a class="btn secondary" href="#how" id="i_cta_how">See How It Works</a>
+      </div>
+      <div style="display:flex; gap:.6rem; margin-top:1.2rem; flex-wrap:wrap">
+        <div class="stat glass"><div class="big" id="counter-meals">0</div><div class="small" id="i_stat_meals">Meals Shared</div></div>
+        <div class="stat glass"><div class="big" id="counter-ngos">0</div><div class="small" id="i_stat_ngos">NGOs Onboarded</div></div>
+        <div class="stat glass"><div class="big" id="counter-co2">0</div><div class="small" id="i_stat_co2">kg CO₂e Avoided</div></div>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="grid-balls">
+        <!-- decorative grid -->
+        <div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div>
+        <div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div>
+        <div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div>
+        <div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div>
+        <div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div>
+        <div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it Works -->
+  <section id="how">
+    <h2 id="i_how_title">How ShareBite Works</h2>
+    <p class="muted" id="i_how_desc">A simple, safe, and fast pipeline from donors to recipients.</p>
+    <div class="cards" role="list">
+      <article class="card" role="listitem">
+        <span class="chip" id="i_step1">Step 1</span>
+        <h3 id="i_step1_title">List Surplus Food</h3>
+        <p id="i_step1_sub">Donors post food type, quantity, pick-up window, and location.</p>
+        <ul class="list">
+          <li>Ready-to-eat | Dry | Packaged</li>
+          <li>Time bound safety window (2–3 hrs)</li>
+          <li>Optional anonymous household donors</li>
+        </ul>
+      </article>
+      <article class="card" role="listitem">
+        <span class="chip" id="i_step2">Step 2</span>
+        <h3 id="i_step2_title">Verify & Assign</h3>
+        <p id="i_step2_sub">Nearest verified NGO/delivery partner is matched in real-time.</p>
+        <ul class="list">
+          <li>Hygiene checklist (FSSAI aligned)</li>
+          <li>Geo-routing & ETA</li>
+          <li>Contactless handover option</li>
+        </ul>
+      </article>
+      <article class="card" role="listitem">
+        <span class="chip" id="i_step3">Step 3</span>
+        <h3 id="i_step3_title">Pickup, Deliver, Track</h3>
+        <p id="i_step3_sub">Live status, photo proof, and impact credits for donors.</p>
+        <ul class="list">
+          <li>Digital receipt & CSR report</li>
+          <li>Gamified badges</li>
+          <li>Feedback & ratings</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- Donate Form -->
+  <section id="donate">
+    <h2 id="i_donate_title">Donate Surplus Food</h2>
+    <p class="muted" id="i_donate_desc">Post a pick-up request. We’ll connect you to the closest verified partner.</p>
+    <form class="form" id="donorForm" novalidate>
+      <div class="row">
+        <div>
+          <label for="dname" id="i_label_name">Your Name</label>
+          <input id="dname" name="name" placeholder="Restaurant / Caterer / Household" required />
+        </div>
+        <div>
+          <label for="dphone" id="i_label_phone">Phone</label>
+          <input id="dphone" name="phone" inputmode="tel" placeholder="+91-" required />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="dtype" id="i_label_type">Food Type</label>
+          <select id="dtype" name="type" required>
+            <option value="">Select</option>
+            <option>Cooked (Veg)</option>
+            <option>Cooked (Non-Veg)</option>
+            <option>Dry Snacks</option>
+            <option>Packaged</option>
+            <option>Ration / Grains</option>
+          </select>
+        </div>
+        <div>
+          <label for="dqty" id="i_label_qty">Approx Quantity (meals)</label>
+          <input id="dqty" name="qty" type="number" min="1" placeholder="e.g., 50" required />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="daddr" id="i_label_addr">Pickup Address</label>
+          <input id="daddr" name="address" placeholder="Street, area, city" required />
+          <div class="inline">
+            <button class="icon-btn" type="button" id="geoBtn">📍 Use my location</button>
+            <a id="mapsLink" class="tiny" target="_blank" rel="noopener">Open in Maps</a>
+          </div>
+        </div>
+        <div>
+          <label for="dtime" id="i_label_window">Pickup Window (hrs)</label>
+          <select id="dtime" name="window" required>
+            <option value="">Select</option>
+            <option>Within 1 hour</option>
+            <option>Within 2 hours</option>
+            <option>Within 3 hours</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="dimg">Add Photo (optional)</label>
+          <input id="dimg" name="photo" type="file" accept="image/*" />
+          <div class="preview" id="imgPreview" aria-live="polite"></div>
+        </div>
+        <div>
+          <label for="dnotes">Notes (optional)</label>
+          <textarea id="dnotes" name="notes" placeholder="Handover instructions, allergens, packing info"></textarea>
+        </div>
+      </div>
+      <div class="inline">
+        <button class="btn" id="donateBtn" type="submit">Request Pickup</button>
+        <button class="icon-btn" type="button" id="donorExport">⬇️ Export CSV</button>
+        <span class="hint" id="i_hint_demo">Submitting creates a demo request saved locally. No server needed.</span>
+      </div>
+    </form>
+  </section>
+
+  <!-- NGO Onboarding -->
+  <section id="ngo">
+    <h2 id="i_ngo_title">NGO & Volunteer Onboarding</h2>
+    <p class="muted" id="i_ngo_desc">Join our verified network to receive donations, deliver meals, and report impact.</p>
+    <div class="cards">
+      <div class="card">
+        <h3 id="i_ngo_reg">NGO Registration</h3>
+        <form class="form" id="ngoForm" novalidate>
+          <label for="nname">Organization Name</label>
+          <input id="nname" name="org" required />
+          <div class="row">
+            <div>
+              <label for="ncity">City</label>
+              <input id="ncity" name="city" required />
+            </div>
+            <div>
+              <label for="nreach">Daily Capacity (meals)</label>
+              <input id="nreach" name="capacity" type="number" min="10" required />
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label for="nlat">Latitude (optional)</label>
+              <input id="nlat" name="lat" type="number" step="any" />
+            </div>
+            <div>
+              <label for="nlon">Longitude (optional)</label>
+              <input id="nlon" name="lon" type="number" step="any" />
+            </div>
+          </div>
+          <div class="inline">
+            <input id="nphone" name="phone" inputmode="tel" placeholder="Phone" required />
+            <button class="icon-btn" type="button" id="ngoGeo">📍 Use my location</button>
+          </div>
+          <div class="inline">
+            <button class="btn" type="submit" id="ngoBtn">Apply as NGO</button>
+            <button class="icon-btn" type="button" id="ngoExport">⬇️ Export CSV</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <h3 id="i_vol_title">Volunteer Signup</h3>
+        <form class="form" id="volForm" novalidate>
+          <div class="row">
+            <div>
+              <label for="vname">Full Name</label>
+              <input id="vname" name="name" required />
+            </div>
+            <div>
+              <label for="vcity">City</label>
+              <input id="vcity" name="city" required />
+            </div>
+          </div>
+          <label for="vskills">Preferred Role</label>
+          <select id="vskills" name="role" required>
+            <option value="">Select</option>
+            <option>Pickup & Delivery</option>
+            <option>Quality & Hygiene</option>
+            <option>Operations</option>
+            <option>Design & Marketing</option>
+          </select>
+          <div class="inline">
+            <button class="btn" type="submit" id="volBtn">Join as Volunteer</button>
+            <button class="icon-btn" type="button" id="volExport">⬇️ Export CSV</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <h3 id="i_safe_title">Safety & Hygiene</h3>
+        <p>We follow FSSAI-aligned food donation guidelines.</p>
+        <ul class="list">
+          <li>Temperature-safe transport.</li>
+          <li>Sealed containers & labelling.</li>
+          <li>Contactless handover on request.</li>
+        </ul>
+        <span class="pill">2–3 hr delivery window</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Impact -->
+  <section id="impact">
+    <h2 id="i_impact_title">Live Impact Dashboard (Demo)</h2>
+    <p class="muted" id="i_impact_desc">These metrics auto-increment to simulate real-time activity.</p>
+    <div class="impact" role="list">
+      <div class="meter" role="listitem">
+        <h3 id="i_m1">Meals Distributed</h3>
+        <progress id="pMeals" max="100" value="0"></progress>
+        <div class="tiny" id="pMealsTxt">0/100</div>
+      </div>
+      <div class="meter" role="listitem">
+        <h3 id="i_m2">NGOs Onboarded</h3>
+        <progress id="pNgos" max="50" value="0"></progress>
+        <div class="tiny" id="pNgosTxt">0/50</div>
+      </div>
+      <div class="meter" role="listitem">
+        <h3 id="i_m3">Volunteers Active</h3>
+        <progress id="pVol" max="80" value="0"></progress>
+        <div class="tiny" id="pVolTxt">0/80</div>
+      </div>
+      <div class="meter" role="listitem">
+        <h3 id="i_m4">CO₂e Avoided (kg)</h3>
+        <progress id="pCO2" max="200" value="0"></progress>
+        <div class="tiny" id="pCO2Txt">0/200</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard: records, trends, backup -->
+  <section id="dashboard">
+    <h2>Operations Dashboard</h2>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-tab="records">📋 Records</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="trends">📈 Trends</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="backup">💾 Backup</button>
+    </div>
+
+    <div class="panel active" id="panel-records" role="tabpanel">
+      <div class="inline" style="margin:.3rem 0 1rem">
+        <input id="search" placeholder="Search name/type/city…" />
+        <select id="filterKind">
+          <option value="all">All</option>
+          <option value="donor">Donors</option>
+          <option value="ngo">NGOs</option>
+          <option value="vol">Volunteers</option>
+        </select>
+        <button class="icon-btn" id="clearData">🗑️ Clear All (local)</button>
+      </div>
+      <div class="card">
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th>Kind</th><th>ID/Org</th><th>Details</th><th>Qty/Cap</th><th>City/Addr</th><th>Date</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-trends" role="tabpanel">
+      <div class="card">
+        <canvas id="trendChart" height="260" aria-label="Meals per day chart" role="img"></canvas>
+      </div>
+      <p class="tiny">Chart uses your local demo data (donations by day). No external libraries.</p>
+    </div>
+
+    <div class="panel" id="panel-backup" role="tabpanel">
+      <div class="card">
+        <div class="inline">
+          <button class="icon-btn" id="downloadJson">⬇️ Export JSON</button>
+          <input type="file" id="uploadJson" accept="application/json" />
+          <span class="hint">Backup/restore your local data.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <h2>FAQ</h2>
+    <div class="kpis">
+      <details>
+        <summary>Is donated food safe?</summary>
+        <p>We accept food within a short time window, ensure sealed packing, and follow a hygiene checklist during pickup.</p>
+      </details>
+      <details>
+        <summary>Do households need to reveal identity?</summary>
+        <p>No. Household donors can stay anonymous while still tracking their impact.</p>
+      </details>
+      <details>
+        <summary>Can my business get CSR reports?</summary>
+        <p>Yes, we provide monthly digital receipts, photos, and impact summaries suitable for CSR documentation.</p>
+      </details>
+      <details>
+        <summary>Which areas are supported?</summary>
+        <p>Pilot: Delhi NCR, Mumbai, Bengaluru, Rohtak. Expansion planned to additional Tier-2/3 cities.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="foot">
+      <div>
+        <div class="brand" style="margin-bottom:.6rem">
+          <div class="logo"></div><strong>ShareBite</strong>
+        </div>
+        <p class="tiny">ShareBite connects surplus food to nearby shelters and NGOs. Together, we reduce waste and hunger.</p>
+      </div>
+      <form class="form" id="newsletter" novalidate>
+        <label for="email" class="sr-only">Email</label>
+        <div class="row">
+          <div>
+            <input id="email" type="email" placeholder="Your email for updates" required />
+          </div>
+          <div>
+            <button class="btn" type="submit" id="newsBtn">Subscribe</button>
+          </div>
+        </div>
+        <span class="hint">No spam. Unsubscribe anytime.</span>
+      </form>
+    </div>
+    <p class="tiny" style="margin-top:1rem">© <span id="year"></span> ShareBite • Built with love & purpose.</p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // -------------------- Helpers & State --------------------
+    const $ = (q, s = document) => s.querySelector(q);
+    const $$ = (q, s = document) => [...s.querySelectorAll(q)];
+    const state = {
+      data: { donors: [], ngos: [], vols: [] },
+      settings: { theme: localStorage.getItem('sb_theme')||'dark', lang: localStorage.getItem('sb_lang')||'en', reduceMotion: localStorage.getItem('sb_motion')==='off' }
+    };
+    document.documentElement.setAttribute('data-theme', state.settings.theme);
+    if(state.settings.reduceMotion) document.body.classList.add('reduce-motion');
+
+    const toast = (msg) => {
+      const t = $('#toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(()=> t.classList.remove('show'), 3200);
+    };
+    const uuid = () => 'SB-' + Math.random().toString(36).slice(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-6);
+    const save = () => localStorage.setItem('sharebite_data', JSON.stringify(state.data));
+    const load = () => { try{ const d = JSON.parse(localStorage.getItem('sharebite_data')||'{}'); if(d.donors&&d.ngos&&d.vols) state.data = d; }catch(e){} };
+    load();
+
+    // -------------------- Mobile menu --------------------
+    const menuBtn = $('#menuToggle');
+    const mobileMenu = $('#mobileMenu');
+    const closeMenu = () => { mobileMenu.classList.remove('show'); menuBtn.setAttribute('aria-expanded','false'); };
+    window.closeMenu = closeMenu;
+    menuBtn?.addEventListener('click', ()=>{ const open = mobileMenu.classList.toggle('show'); menuBtn.setAttribute('aria-expanded', open ? 'true':'false'); });
+
+    // -------------------- Counters (hero demo) --------------------
+    const animateCount = (el, target, dur=1200) => {
+      const start = 0, startT = performance.now();
+      const step = (now)=>{ const p = Math.min(1, (now-startT)/dur); el.textContent = Math.round(start + (target-start)*p).toLocaleString('en-IN'); if(p<1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    };
+    const counters = ()=>{ animateCount($('#counter-meals'), 128340); animateCount($('#counter-ngos'), 246); animateCount($('#counter-co2'), 53210); };
+
+    // -------------------- Impact meters (demo loop) --------------------
+    const meters = [
+      {bar: '#pMeals', txt:'#pMealsTxt', max:100, step:1},
+      {bar: '#pNgos',  txt:'#pNgosTxt', max:50,  step:.5},
+      {bar: '#pVol',   txt:'#pVolTxt',  max:80,  step:.8},
+      {bar: '#pCO2',   txt:'#pCO2Txt',  max:200, step:1.5},
+    ];
+    let meterTimer;
+    const loopMeters = ()=>{
+      clearInterval(meterTimer);
+      meterTimer = setInterval(()=>{
+        meters.forEach(m=>{ const bar = $(m.bar), txt = $(m.txt); let val = Number(bar.value) + m.step; if(val > m.max) val = 0; bar.value = val; txt.textContent = `${Math.round(val)}/${bar.max}`; })
+      }, 120);
+    };
+
+    // -------------------- Validation + Notification --------------------
+    const required = (form) => {
+      const fields = $$('input[required], select[required], textarea[required]', form);
+      for(const f of fields){ if(!f.value.trim()){ f.focus(); return false; }
+        if(f.type === 'number' && Number(f.value) <= 0){ f.focus(); return false; }
+        if(f.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.value)){ f.focus(); return false; }
+      } return true;
+    };
+    const notify = (title, body) => {
+      if(!('Notification' in window)) return;
+      if(Notification.permission === 'granted'){ new Notification(title, { body }); }
+      else if(Notification.permission !== 'denied'){ Notification.requestPermission().then(p=>{ if(p==='granted') new Notification(title, { body }); }); }
+    };
+
+    // -------------------- Geolocation helpers --------------------
+    const getLocation = () => new Promise((res, rej)=> {
+      if(!navigator.geolocation) return rej('Geolocation not supported');
+      navigator.geolocation.getCurrentPosition(pos=> res(pos.coords), err=> rej(err.message), { enableHighAccuracy:true, timeout:8000 });
+    });
+    const mapsHref = (lat, lon) => `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=16/${lat}/${lon}`;
+
+    // -------------------- Image preview -> DataURL --------------------
+    const fileToDataURL = (file) => new Promise((res, rej)=>{ const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(file); });
+
+    // -------------------- Forms: Donor --------------------
+    $('#dimg')?.addEventListener('change', async (e)=>{
+      const file = e.target.files?.[0]; const prev = $('#imgPreview'); prev.innerHTML='';
+      if(file){ const url = await fileToDataURL(file); const img = new Image(); img.src = url; img.alt = 'Preview'; prev.appendChild(img); prev.dataset.url = url; } else { delete prev.dataset.url; }
+    });
+
+    $('#geoBtn')?.addEventListener('click', async ()=>{
+      try{ const c = await getLocation(); $('#mapsLink').href = mapsHref(c.latitude, c.longitude); $('#mapsLink').textContent = `Lat ${c.latitude.toFixed(4)}, Lon ${c.longitude.toFixed(4)}`; toast('Location captured.'); }
+      catch(e){ toast('Unable to get location. Check permissions.'); }
+    });
+
+    const mockSubmit = async (btn, payload, label) => {
+      btn.setAttribute('aria-busy','true'); btn.disabled = true; await new Promise(r=> setTimeout(r, 600)); btn.removeAttribute('aria-busy'); btn.disabled = false; toast(`${label} received.`);
+    };
+
+    $('#donorForm')?.addEventListener('submit', async (e)=>{
+      e.preventDefault(); const form = e.currentTarget; if(!required(form)){ toast('Please fill all required fields.'); return; }
+      const data = Object.fromEntries(new FormData(form).entries());
+      const link = $('#mapsLink').href || '';
+      const photo = $('#imgPreview')?.dataset.url || '';
+      const rec = { id: uuid(), kind:'donor', ts: Date.now(), ...data, qty: Number(data.qty||0), maps: link, photo };
+      state.data.donors.unshift(rec); save();
+      await mockSubmit($('#donateBtn'), rec, 'Pickup request');
+      notify('ShareBite: Pickup request logged', `ID ${rec.id} • ${rec.qty} meals`);
+      try{ if(state.data.ngos.length && rec.maps.includes('openstreetmap')) { /* rough ETA using closest NGO with lat/lon */
+        const match = nearestNgo(rec.maps);
+        if(match){ toast(`Nearest NGO: ${match.org} • ~${match.dist.toFixed(1)} km`); }
+      } }catch(_){ }
+      form.reset(); $('#imgPreview').innerHTML=''; $('#mapsLink').textContent='Open in Maps'; $('#mapsLink').removeAttribute('href');
+      renderTable(); drawChart();
+    });
+
+    // -------------------- Forms: NGO / Volunteer --------------------
+    $('#ngoGeo')?.addEventListener('click', async ()=>{
+      try{ const c = await getLocation(); $('#nlat').value = c.latitude; $('#nlon').value = c.longitude; toast('NGO location captured.'); }
+      catch(e){ toast('Unable to get location.'); }
+    });
+
+    $('#ngoForm')?.addEventListener('submit', async (e)=>{
+      e.preventDefault(); const form = e.currentTarget; if(!required(form)){ toast('Please fill all required fields.'); return; }
+      const data = Object.fromEntries(new FormData(form).entries());
+      const rec = { id: uuid(), kind:'ngo', ts: Date.now(), ...data, capacity: Number(data.capacity||0), lat: Number(data.lat||0)||null, lon: Number(data.lon||0)||null };
+      state.data.ngos.unshift(rec); save(); await mockSubmit($('#ngoBtn'), rec, 'NGO application'); form.reset(); renderTable();
+    });
+
+    $('#volForm')?.addEventListener('submit', async (e)=>{
+      e.preventDefault(); const form = e.currentTarget; if(!required(form)){ toast('Please fill all required fields.'); return; }
+      const data = Object.fromEntries(new FormData(form).entries());
+      const rec = { id: uuid(), kind:'vol', ts: Date.now(), ...data };
+      state.data.vols.unshift(rec); save(); await mockSubmit($('#volBtn'), rec, 'Volunteer signup'); form.reset(); renderTable();
+    });
+
+    $('#newsletter')?.addEventListener('submit', async (e)=>{ e.preventDefault(); const form = e.currentTarget; if(!required(form)){ toast('Enter a valid email.'); return; } const email = $('#email').value.trim(); await mockSubmit($('#newsBtn'), {email}, 'Subscription'); form.reset(); });
+
+    // -------------------- Records table / filters --------------------
+    const fmtDate = (t)=> new Date(t).toLocaleString();
+    const renderTable = ()=>{
+      const q = ($('#search').value||'').toLowerCase(); const kind = $('#filterKind').value;
+      const rows = [
+        ...state.data.donors.map(d=>({kind:'donor', a:d})),
+        ...state.data.ngos.map(d=>({kind:'ngo', a:d})),
+        ...state.data.vols.map(d=>({kind:'vol', a:d})),
+      ].filter(r=> kind==='all' || r.kind===kind ).filter(r=> JSON.stringify(r.a).toLowerCase().includes(q));
+      const tb = $('#tbl tbody'); tb.innerHTML = rows.map(r=>{
+        if(r.kind==='donor'){
+          const a=r.a; return `<tr><td>Donor</td><td class="mono">${a.id}</td><td>${a.type||''}${a.photo? ' • 📷':''}</td><td>${a.qty||''}</td><td>${a.address||''}</td><td>${fmtDate(a.ts)}</td></tr>`;
+        } else if(r.kind==='ngo'){
+          const a=r.a; return `<tr><td>NGO</td><td>${a.org}</td><td>${a.phone||''}</td><td>${a.capacity||''}</td><td>${a.city||''}</td><td>${fmtDate(a.ts)}</td></tr>`;
+        } else {
+          const a=r.a; return `<tr><td>Volunteer</td><td>${a.name}</td><td>${a.role||''}</td><td>-</td><td>${a.city||''}</td><td>${fmtDate(a.ts)}</td></tr>`;
+        }
+      }).join('');
+    };
+
+    $('#search').addEventListener('input', renderTable);
+    $('#filterKind').addEventListener('change', renderTable);
+
+    // -------------------- Distance / Nearest NGO --------------------
+    const parseLatLonFromOsm = (href)=>{ try{ const u = new URL(href); const lat = Number(u.searchParams.get('mlat')); const lon = Number(u.searchParams.get('mlon')); return {lat,lon}; }catch{ return null; } };
+    const haversine = (a,b)=>{ const toRad=(d)=>d*Math.PI/180; const R=6371; const dLat=toRad(b.lat-a.lat); const dLon=toRad(b.lon-a.lon); const lat1=toRad(a.lat), lat2=toRad(b.lat); const s= Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2; return 2*R*Math.asin(Math.sqrt(s)); };
+    const nearestNgo = (maps)=>{ const pt = parseLatLonFromOsm(maps); if(!pt) return null; let best=null; state.data.ngos.forEach(n=>{ if(n.lat && n.lon){ const d=haversine(pt,{lat:n.lat,lon:n.lon}); if(!best||d<best.dist) best={...n, dist:d}; } }); return best; };
+
+    // -------------------- CSV & JSON Export/Import --------------------
+    const toCSV = (rows)=> rows.map(r=> r.map(c=> '"'+String(c).replaceAll('"','""')+'"').join(',')).join('\n');
+    const dl = (name, text, type='text/plain')=>{ const blob = new Blob([text], {type}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href); };
+
+    $('#donorExport').addEventListener('click', ()=>{ const rows=[["id","type","qty","address","window","phone","ts"]].concat(state.data.donors.map(d=>[d.id,d.type,d.qty,d.address,d.window,d.phone,new Date(d.ts).toISOString()])); dl('sharebite_donors.csv', toCSV(rows)); });
+    $('#ngoExport').addEventListener('click', ()=>{ const rows=[["org","city","capacity","phone","lat","lon","ts"]].concat(state.data.ngos.map(d=>[d.org,d.city,d.capacity,d.phone,d.lat||'',d.lon||'',new Date(d.ts).toISOString()])); dl('sharebite_ngos.csv', toCSV(rows)); });
+    $('#volExport').addEventListener('click', ()=>{ const rows=[["name","city","role","ts"]].concat(state.data.vols.map(d=>[d.name,d.city,d.role,new Date(d.ts).toISOString()])); dl('sharebite_volunteers.csv', toCSV(rows)); });
+
+    $('#downloadJson').addEventListener('click', ()=> dl('sharebite_backup.json', JSON.stringify(state.data, null, 2), 'application/json'));
+    $('#uploadJson').addEventListener('change', async (e)=>{ const f = e.target.files?.[0]; if(!f) return; const text = await f.text(); try{ const obj = JSON.parse(text); if(obj.donors&&obj.ngos&&obj.vols){ state.data = obj; save(); toast('Data restored.'); renderTable(); drawChart(); } else toast('Invalid backup file.'); }catch{ toast('Invalid JSON file.'); } });
+
+    $('#clearData').addEventListener('click', ()=>{ if(confirm('Clear all local demo data?')){ state.data={donors:[],ngos:[],vols:[]}; save(); renderTable(); drawChart(); toast('Local data cleared.'); } });
+
+    // -------------------- Tabs --------------------
+    $$('.tab').forEach(btn=> btn.addEventListener('click', ()=>{ $$('.tab').forEach(b=> b.setAttribute('aria-selected','false')); btn.setAttribute('aria-selected','true'); $$('.panel').forEach(p=> p.classList.remove('active')); $('#panel-'+btn.dataset.tab).classList.add('active'); if(btn.dataset.tab==='trends') drawChart(); }));
+
+    // -------------------- Simple Chart (Canvas 2D) --------------------
+    const groupByDay = ()=>{
+      const map = new Map(); state.data.donors.forEach(d=>{ const day = new Date(d.ts); day.setHours(0,0,0,0); const k = day.getTime(); map.set(k, (map.get(k)||0) + (Number(d.qty)||0)); });
+      // last 7 days
+      const arr=[]; for(let i=6;i>=0;i--){ const day=new Date(); day.setHours(0,0,0,0); day.setDate(day.getDate()-i); const k=day.getTime(); arr.push({x: day, y: map.get(k)||0}); }
+      return arr;
+    };
+    const drawChart = ()=>{
+      const c = $('#trendChart'); const ctx = c.getContext('2d'); const data = groupByDay();
+      ctx.clearRect(0,0,c.width,c.height); const W=c.width= c.clientWidth*2; const H=c.height= 260*2; ctx.scale(2,2);
+      const pad=30; const max = Math.max(10, ...data.map(d=>d.y)); const barW = (c.clientWidth - pad*2) / data.length * .6; const step = (c.clientWidth - pad*2) / data.length;
+      // axes
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(pad, 230); ctx.lineTo(c.clientWidth-pad,230); ctx.stroke();
+      // bars
+      data.forEach((d,i)=>{ const x = pad + i*step + step*.2; const h = (d.y/max)*190; const y = 230-h; ctx.fillStyle = i%2? '#22c55e' : '#14b8a6'; ctx.fillRect(x, y, barW, h); ctx.fillStyle = 'rgba(255,255,255,.6)'; ctx.font='12px system-ui'; ctx.fillText(String(d.y), x, y-4); ctx.fillText(d.x.toLocaleDateString(undefined,{weekday:'short'}), x, 248); });
+      // title
+      ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.font='14px system-ui'; ctx.fillText('Meals shared — last 7 days', pad, 18);
+    };
+
+    // -------------------- Theme, Motion, Language --------------------
+    const themeBtn = $('#themeToggle');
+    themeBtn.addEventListener('click', ()=>{ const cur = document.documentElement.getAttribute('data-theme'); const next = cur==='dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', next); localStorage.setItem('sb_theme', next); });
+
+    const motionBtn = $('#motionToggle');
+    motionBtn.addEventListener('click', ()=>{ const on = document.body.classList.toggle('reduce-motion'); const reduced = document.body.classList.contains('reduce-motion'); localStorage.setItem('sb_motion', reduced?'off':'on'); motionBtn.setAttribute('aria-pressed', reduced?'true':'false'); });
+
+    const i18n = {
+      en: {
+        i_brand:'ShareBite', i_nav_how:'How it works', i_nav_donate:'Donate Food', i_nav_ngo:'NGOs', i_nav_impact:'Impact', i_nav_dash:'Dashboard', i_nav_faq:'FAQ', i_theme:'Theme', i_motion:'Motion',
+        i_tag:'Zero Food Waste • Zero Hunger', i_h1:'Turn surplus meals into smiles—instantly.', i_sub:'ShareBite connects restaurants, caterers, events, and households with NGOs and shelters nearby. Post leftovers, get a pickup, track impact.', i_cta_donate:'Donate Food Now', i_cta_how:'See How It Works', i_cta_start:'Start Donating', i_stat_meals:'Meals Shared', i_stat_ngos:'NGOs Onboarded', i_stat_co2:'kg CO₂e Avoided',
+        i_how_title:'How ShareBite Works', i_how_desc:'A simple, safe, and fast pipeline from donors to recipients.', i_step1:'Step 1', i_step1_title:'List Surplus Food', i_step1_sub:'Donors post food type, quantity, pick-up window, and location.', i_step2:'Step 2', i_step2_title:'Verify & Assign', i_step2_sub:'Nearest verified NGO/delivery partner is matched in real-time.', i_step3:'Step 3', i_step3_title:'Pickup, Deliver, Track', i_step3_sub:'Live status, photo proof, and impact credits for donors.',
+        i_donate_title:'Donate Surplus Food', i_donate_desc:"Post a pick-up request. We'll connect you to the closest verified partner.", i_label_name:'Your Name', i_label_phone:'Phone', i_label_type:'Food Type', i_label_qty:'Approx Quantity (meals)', i_label_addr:'Pickup Address', i_label_window:'Pickup Window (hrs)', i_hint_demo:'Submitting creates a demo request saved locally. No server needed.',
+        i_ngo_title:'NGO & Volunteer Onboarding', i_ngo_desc:'Join our verified network to receive donations, deliver meals, and report impact.', i_ngo_reg:'NGO Registration', i_vol_title:'Volunteer Signup', i_safe_title:'Safety & Hygiene', i_impact_title:'Live Impact Dashboard (Demo)', i_impact_desc:'These metrics auto-increment to simulate real-time activity.', i_m1:'Meals Distributed', i_m2:'NGOs Onboarded', i_m3:'Volunteers Active', i_m4:'CO₂e Avoided (kg)'
+      },
+      hi: {
+        i_brand:'शेयरबाइट', i_nav_how:'कैसे काम करता है', i_nav_donate:'भोजन दान', i_nav_ngo:'एनजीओ', i_nav_impact:'प्रभाव', i_nav_dash:'डैशबोर्ड', i_nav_faq:'प्रश्न', i_theme:'थीम', i_motion:'मोशन',
+        i_tag:'शून्य खाद्य अपव्यय • शून्य भूख', i_h1:'बचा हुआ भोजन मुस्कान में बदलें — तुरंत।', i_sub:'शेयरबाइट रेस्त्रां, केटरर, कार्यक्रमों और परिवारों को पास के एनजीओ/शेल्टर से जोड़ता है। भोजन पोस्ट करें, पिकअप पाएं, प्रभाव ट्रैक करें।', i_cta_donate:'अभी भोजन दान करें', i_cta_how:'कैसे काम करता है देखें', i_cta_start:'दान शुरू करें', i_stat_meals:'बंटे भोजन', i_stat_ngos:'जुड़े एनजीओ', i_stat_co2:'किग्रा CO₂e बचत',
+        i_how_title:'शेयरबाइट कैसे काम करता है', i_how_desc:'दाताओं से ज़रूरतमंद तक तेज़, सुरक्षित और सरल प्रणाली।', i_step1:'चरण 1', i_step1_title:'अतिरिक्त भोजन सूचीबद्ध करें', i_step1_sub:'खाद्य प्रकार, मात्रा, पिकअप समय और स्थान भरें।', i_step2:'चरण 2', i_step2_title:'सत्यापन व असाइन', i_step2_sub:'सबसे नज़दीकी सत्यापित एनजीओ/डिलीवरी पार्टनर जोड़ दिया जाता है।', i_step3:'चरण 3', i_step3_title:'पिकअप, वितरण, ट्रैक', i_step3_sub:'लाइव स्थिति, फोटो प्रमाण और प्रभाव क्रेडिट।',
+        i_donate_title:'अतिरिक्त भोजन दान करें', i_donate_desc:'पिकअप अनुरोध बनाएँ। हम आपको नज़दीकी सत्यापित पार्टनर से जोड़ेंगे।', i_label_name:'आपका नाम', i_label_phone:'फ़ोन', i_label_type:'भोजन प्रकार', i_label_qty:'अनुमानित मात्रा (भोजन)', i_label_addr:'पिकअप पता', i_label_window:'पिकअप विंडो (घंटे)', i_hint_demo:'यह डेमो लोकल सेव होता है। सर्वर की ज़रूरत नहीं।',
+        i_ngo_title:'एनजीओ व स्वयंसेवक पंजीकरण', i_ngo_desc:'हमारे सत्यापित नेटवर्क से जुड़ें—दान प्राप्त करें, भोजन पहुँचाएँ, प्रभाव रिपोर्ट करें।', i_ngo_reg:'एनजीओ पंजीकरण', i_vol_title:'स्वयंसेवक जुड़ें', i_safe_title:'सुरक्षा व स्वच्छता', i_impact_title:'लाइव प्रभाव डैशबोर्ड (डेमो)', i_impact_desc:'संकेतक स्वतः बढ़ते हैं।', i_m1:'वितरित भोजन', i_m2:'जुड़े एनजीओ', i_m3:'सक्रिय स्वयंसेवक', i_m4:'CO₂e बचत (किग्रा)'
+      }
+    };
+    const applyLang = (lang)=>{ Object.entries(i18n[lang]).forEach(([id, text])=>{ const el = document.getElementById(id); if(el) el.textContent = text; }); localStorage.setItem('sb_lang', lang); };
+    $('#lang').value = state.settings.lang; applyLang(state.settings.lang);
+    $('#lang').addEventListener('change', (e)=> applyLang(e.target.value));
+
+    // -------------------- Render on load --------------------
+    const init = ()=>{ $('#year').textContent = new Date().getFullYear(); counters(); loopMeters(); renderTable(); drawChart(); };
+    init();
+  </script>
+</body>
+</html>
